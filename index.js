@@ -39,7 +39,6 @@ app.get('/', function(req, res) {
     var ci = new mod1.CsfdInfo(res, userId, type, version);
     ci.returnStatistics();
     
-    
 });
 
 
@@ -51,8 +50,8 @@ app.get('/index.html', function (req, res) {
         res.writeHeader(200, {"Content-Type": "text/html"});
         res.write(html);
         res.end();
-    })
-})
+    });
+});
 
 /* secret test page */
 app.get('/crap!', function (req, res) {
@@ -69,11 +68,12 @@ app.get('/crap!', function (req, res) {
 //    app.use(express.static(__dirname + '/public'));
 //});
 
+var port = process.env.PORT || 2301;
 // listening on port
-app.listen(2301);
+app.listen(port);
 
 console.log('App running on port 2301 ...');
-console.log('Example - type in browser:');
+console.log('Example usage - type in browser:');
 console.log('serverurl:2301/?type=ratings&version=1&user=304220');
 
 //////////////////////////////////////////////////////////////////////////

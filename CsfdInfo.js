@@ -42,6 +42,8 @@ var CsfdInfo = function (res, userId, type, version) {
     
     this._ratingsImageBackgroundPath1 = './public/images/app/ratings_bg1.jpg';
     
+    this._metaInfoPath = './appdata/metaInfo.json';
+    
     // get API user url
     this._getApiUserUrl = 'http://csfdapi.cz/user/';
 };
@@ -99,7 +101,11 @@ CsfdInfo.prototype._getSourceDataAndStartProcess = function (userId) {
  */
 CsfdInfo.prototype._useCache = function (userId) {
     
-    // TODO decide when use cache, for now simplified
+    fs.readFile(this._metaInfoPath, 'utf8', function (err, metaInfoData) {
+        
+        var metaInfo = JSON.parse(metaInfoData).metaInfo;
+    });
+    
     return true;
 };
 
