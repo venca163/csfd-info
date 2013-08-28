@@ -80,19 +80,22 @@ CsfdInfo.prototype.returnStatistics = function () {
  */
 CsfdInfo.prototype._getSourceDataAndStartProcess = function (userId) {
     
-    var dataExists = fs.existsSync(this._cacheRatingsPath + userId + '.json');
 
     // TODO readme: always using cache in development
-    if (dataExists && this._useCache(userId) ) {
-        log('get ratings from cache');
-        this._getRatingsFromCache(userId);
-    }
-    else {
+    if (this._useCache(userId)) {
+        var dataExists = fs.existsSync(this._cacheRatingsPath + userId + '.json');
+        if (dataExists) {
+            log('get ratings from cache');
+            this._getRatingsFromCache(userId);
+        } else {
+            this._req.end('first time meta info not created');
+        }
+    } else {
         // TODO add - if server not responding, try to serve at least old cache file
-        
         log('get ratings from api');
         this._getRatingsFromApi(userId);
     }
+
     
 };
 
@@ -100,14 +103,57 @@ CsfdInfo.prototype._getSourceDataAndStartProcess = function (userId) {
  * Decide wether use cache or not.
  */
 CsfdInfo.prototype._useCache = function (userId) {
-    
-    fs.readFile(this._metaInfoPath, 'utf8', function (err, metaInfoData) {
+
+    // get meta info from file
+    var metaInfoData = fs.readFileSync(this._metaInfoPath, 'utf8');
+    var metaInfo = JSON.parse(metaInfoData);
+
+    var userInfo = metaInfo.metaInfo.ratings[userId];
+    if (userInfo) {
+        var now = getNowSeconds();
         
-        var metaInfo = JSON.parse(metaInfoData).metaInfo;
-    });
+        // if data older than hour, update them and return false
+        log('differ ' + (now - userInfo.lastReq));
+        if (now - userInfo.lastReq > 3600) {
+            userInfo.lastReq = getNowSeconds();
+            userInfo.reqCount++;
+
+            this._updateMetaInfo(metaInfo);
+            return false;
+        }
+        // use cache, just update reqCount
+        else {
+            userInfo.reqCount++;
+            this._updateMetaInfo(metaInfo);
+        }
+    } 
+    // first time request
+    // store meta data for next time and return false
+    else {
+        var newUserInfo = {
+            lastReq: getNowSeconds(),
+            reqCount: 1
+        }
+        metaInfo.metaInfo.ratings[userId] = newUserInfo;
+        this._updateMetaInfo(metaInfo);
+        
+        return false;
+    }
     
     return true;
 };
+
+/*
+ *  Update meta info.
+ */
+CsfdInfo.prototype._updateMetaInfo = function (metaInfo) {
+    
+    var metaInfoToWrite = JSON.stringify(metaInfo);
+    var fd = fs.openSync(this._metaInfoPath, 'w');
+    var buf = new Buffer(metaInfoToWrite);
+    fs.writeSync(fd, buf, 0, buf.length, 0);
+
+}
 
 /*
  * Asynchronously read data from csfdapi.cz.
@@ -121,15 +167,28 @@ CsfdInfo.prototype._getRatingsFromApi = function (userId) {
         contentType: 'application/json; charset=utf-8',
         timeout: 10000,
         success: function (ratingsData) {
+            csfdInfo._saveRatingsToCache(userId, ratingsData);
             csfdInfo._processRatingsData(ratingsData);
         },
         error: function (xhr, ajaxOptions, thrownError) {
+            log('error >> while getting data from API');
             log(xhr.status);
             log(ajaxOptions);
             log(thrownError);
             csfdInfo._processRatingsData([]);
         }
     });
+};
+
+/*
+ * 
+ */
+CsfdInfo.prototype._saveRatingsToCache = function (userId, ratings) {
+    
+    var ratingsToWrite = JSON.stringify(ratings);
+    var fd = fs.openSync(this._cacheRatingsPath + userId + '.json', 'w');
+    var buf = new Buffer(ratingsToWrite);
+    fs.writeSync(fd, buf, 0, buf.length, 0);
 };
 
 /*
@@ -234,7 +293,7 @@ CsfdInfo.prototype._generateRatingsImage = function () {
 
         ctx.font = 'bold italic 15pt Calibri';
         ctx.fillStyle = 'white';
-        ctx.fillText("ČSFD ratings", 5, 30);
+        ctx.fillText("CSFD ratings", 5, 30);
         
 
         ctx.fillStyle = '#111';
@@ -311,6 +370,7 @@ module.exports.CsfdInfo = CsfdInfo;
 // custom functions
 var mod2 = require('./helper.js');
 var log = mod2.log; // take each function like this? ugly!
+var getNowSeconds = mod2.getNowSeconds; 
 
 
 
