@@ -30,9 +30,6 @@ app.get('/', function(req, res) {
         version = 1;
     }
 
-
-    
-
     // forward to 'CsfdInfo' class
     // returns image as response (if possible)
     var mod1 = require('./CsfdInfo.js');
@@ -64,9 +61,10 @@ app.get('/crap!', function (req, res) {
 // app configuration 
 
 // serving static files - in public directory
-//app.configure(function(){
-//    app.use(express.static(__dirname + '/public'));
-//});
+app.configure(function(){
+    app.use(express.static(__dirname + '/public'));
+    app.use(express.static(__dirname + '/appdata'));
+});
 
 var port = process.env.PORT || 2301;
 // listening on port

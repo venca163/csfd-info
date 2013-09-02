@@ -31,6 +31,8 @@ var CsfdInfo = function (res, userId, type, version) {
     };
 
     
+    // cache interval: 3 hours
+    this.cacheInterval = 10800;
     
     /////////////////////////////////////////////////////////////
     // constants
@@ -62,7 +64,7 @@ CsfdInfo.prototype.returnStatistics = function () {
     
     // for now, just ratings
     if (this._type === 'ratings') {
-        this._getSourceDataAndStartProcess(this._userId);
+        this._processRatings(this._userId);
     } else {
         this._error('type of request unknown');
     }
@@ -75,34 +77,18 @@ CsfdInfo.prototype.returnStatistics = function () {
 
 
 
-/*
- * Decide whether use cached data or get new one.
- */
-CsfdInfo.prototype._getSourceDataAndStartProcess = function (userId) {
+
+CsfdInfo.prototype._processRatings = function (userId) {
     
-
-    // TODO readme: always using cache in development
-    if (this._useCache(userId)) {
-        var dataExists = fs.existsSync(this._cacheRatingsPath + userId + '.json');
-        if (dataExists) {
-            log('get ratings from cache');
-            this._getRatingsFromCache(userId);
-        } else {
-            this._req.end('first time meta info not created');
-        }
-    } else {
-        // TODO add - if server not responding, try to serve at least old cache file
-        log('get ratings from api');
-        this._getRatingsFromApi(userId);
-    }
-
+    // Decide whether use cached data or get new one.
+    this._useCacheOrApi(userId);
     
 };
 
 /*
- * Decide wether use cache or not.
+ * Decide whether use cached data or get new one.
  */
-CsfdInfo.prototype._useCache = function (userId) {
+CsfdInfo.prototype._useCacheOrApi = function (userId) {
 
     // get meta info from file
     var metaInfoData = fs.readFileSync(this._metaInfoPath, 'utf8');
@@ -112,36 +98,94 @@ CsfdInfo.prototype._useCache = function (userId) {
     if (userInfo) {
         var now = getNowSeconds();
         
-        // if data older than hour, update them and return false
-        log('differ ' + (now - userInfo.lastReq));
-        if (now - userInfo.lastReq > 3600) {
-            userInfo.lastReq = getNowSeconds();
-            userInfo.reqCount++;
+        // if data older than cache interval (set to 3 hours), 
+        // dont use cache immediately, try to find if totalRatingsNum change first
+        // if not, use cache...if changed, use API to get new data
+        if ( (now - userInfo.lastReq) > this.cacheInterval) {
 
-            this._updateMetaInfo(metaInfo);
-            return false;
+            var csfdInfo = this;
+            $.ajax({
+                url: this._getApiUserUrl + userId,
+                crossDomain: true,
+                contentType: 'application/json; charset=utf-8',
+                timeout: 10000,
+                success: function (ratingsData) {
+                    // if: use API, values are different
+                    if (ratingsData.total_ratings !== userInfo.lastRatingsNum) {
+                        userInfo.lastReq = getNowSeconds();
+                        userInfo.lastRatingsNum = ratingsData.total_ratings;
+                        userInfo.reqCount++;
+                        csfdInfo._updateMetaInfo(metaInfo);
+                        
+                        log('use API, second chance failed');
+                        // get ratings from API, no cache
+                        csfdInfo._getRatingsFromApi(userId);
+                    } 
+                    // else: use cache, ratings num did not changed since last time
+                    else {
+                        log('use cache second chance');
+                        userInfo.reqCount++;
+                        csfdInfo._updateMetaInfo(metaInfo);
+                        
+                        csfdInfo._useCache(userId);
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    log('error >> while getting data from API');
+                    log(xhr.status);
+                    log(ajaxOptions);
+                    log(thrownError);
+                    // retrieving totalRatingsNum failed
+                    csfdInfo._getRatingsFromApi(userId);
+                }
+            });
         }
-        // use cache, just update reqCount
+        // else data not too old - use cache, just update reqCount
         else {
             userInfo.reqCount++;
             this._updateMetaInfo(metaInfo);
+            
+            this._useCache(userId);
         }
     } 
     // first time request
-    // store meta data for next time and return false
+    // store meta data for next time and dont use cache (there isnt one)
     else {
         var newUserInfo = {
             lastReq: getNowSeconds(),
+            lastRatingsNum: -1,
             reqCount: 1
-        }
+        };
         metaInfo.metaInfo.ratings[userId] = newUserInfo;
         this._updateMetaInfo(metaInfo);
         
-        return false;
+        // get ratings from API, no cache
+        this._getRatingsFromApi(userId);
     }
     
-    return true;
 };
+
+/*
+ * Check if cache exist, if so use it.
+ */
+CsfdInfo.prototype._useCache = function (userId, apiFailFallback) {
+    
+    var dataExists = fs.existsSync(this._cacheRatingsPath + userId + '.json');
+    if (dataExists) {
+        this._getRatingsFromCache(userId);
+    } 
+    // fallback if cache retrieving fails
+    else {
+        if (apiFailFallback) {
+            log('ERR >> API not reachable, no cache available. ' + userId);
+            // everything failed
+            this._processRatingsData([]);
+        } else {
+            console.log('ERR >> meta info exists, but cache file missing: ' + userId);
+            this._getRatingsFromApi(userId);
+        }
+    }
+}
 
 /*
  *  Update meta info.
@@ -160,6 +204,7 @@ CsfdInfo.prototype._updateMetaInfo = function (metaInfo) {
  */
 CsfdInfo.prototype._getRatingsFromApi = function (userId) {
     
+    log('>> API ' + userId);
     var csfdInfo = this;
     $.ajax({
         url: this._getApiUserUrl + userId + '/ratings',
@@ -175,7 +220,10 @@ CsfdInfo.prototype._getRatingsFromApi = function (userId) {
             log(xhr.status);
             log(ajaxOptions);
             log(thrownError);
-            csfdInfo._processRatingsData([]);
+            // retrieving from API failed, so try cache (if available)
+            // but let useCache() you do not want to call API as fallback
+            // (it could get into cyclus)
+            csfdInfo._useCache(userId, 'noapi');
         }
     });
 };
@@ -196,6 +244,7 @@ CsfdInfo.prototype._saveRatingsToCache = function (userId, ratings) {
  */
 CsfdInfo.prototype._getRatingsFromCache = function (userId) {
     
+    log('>> cache ' + userId);
     var csfdInfo = this;
     fs.readFile(this._cacheRatingsPath + userId + '.json', 'utf8', function (err, ratingsData) {
         
@@ -291,7 +340,7 @@ CsfdInfo.prototype._generateRatingsImage = function () {
 
         ctx.drawImage(img,0,0, img.width, img.height);
 
-        ctx.font = 'bold italic 15pt Calibri';
+        ctx.font = 'bold italic 15pt Arial';
         ctx.fillStyle = 'white';
         ctx.fillText("CSFD ratings", 5, 30);
         
@@ -299,9 +348,9 @@ CsfdInfo.prototype._generateRatingsImage = function () {
         ctx.fillStyle = '#111';
         var x = 125, y = 193, i;
         for (i=0; i<csfdInfo.ratings.distribution.length; i++) {
-            ctx.font = 'bold 10pt Calibri';
+            ctx.font = 'bold 10pt Arial';
             ctx.fillText(csfdInfo.ratings.distribution[i], x, y);
-            ctx.font = '10pt Calibri';
+            ctx.font = '10pt Arial';
             ctx.fillText('(' + csfdInfo.ratings.percentageDistribution[i] + '%)', x+35, y);
             y -= 25;
         }
