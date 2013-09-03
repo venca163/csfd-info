@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>ČSFD info - návod</title>
+        <style type="text/css">
+            body {
+              font-family: "Bookman Old Style", "Serifa BT", "URW Bookman L", "itc bookman", times, serif;
+              font-size: large;
+              margin: 0;
+              padding: 0;
+              margin-left: 10em;
+              color: #555;
+              background: #ddd;
+            }
+            
+            #header {
+                border-bottom: 1em solid #555;
+                background: #999;
+            }
+            
+            #header img,
+            #header h1 {
+                float: left;
+            }
+            
+            h1 {
+                margin-left: 0.5em;
+                margin-top: 1em;
+                font-size: 250%;
+                color: #eee;
+            }
+            
+            .cleaner {
+                clear: both;
+                height: 1px;
+                visibility: hidden;
+            }
+            
+            
+            #content p {
+                width: 70%;
+            }
+            
+            #content0 {
+                font-size: 150%;
+                height: 3em;
+                padding-left: 1em;
+                border-left: 3em solid #eee;
+            }
+            #content0 p {
+                width: 100%;
+            }
+            
+            #content1 {
+                padding-left: 1em;
+                border-left: 2em solid crimson;
+            }
+            
+            #content2 {
+                margin-top: 3em;
+                padding-left: 1em;
+                border-left: 2em solid yellowgreen;
+            }
+            
+            #content3 {
+                margin-top: 4em;
+                padding-left: 1em;
+                border-left: 2em solid #eee;
+            }
+            
+            .code {
+                font-size: 120%;
+                color: #111;
+                background: #eee;
+            }
+            
+            span {
+                color: crimson;
+                font-weight: bold;
+            }
+            
+            #footer {
+                margin-top: 8em;
+                margin-bottom: 2em;
+                font-size: 80%;
+                border-top: 1px solid #777;
+            }
+            
+            #footer a, #footer a:visited, #footer a:active {
+                color: #777;
+            }
+            #footer a:hover {
+                text-decoration: none;
+                color: #333;
+            }
+
+            .csfdInfo {
+                color: #333;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div id="header">
+            <img src="http://csfd.herokuapp.com/?type=ratings&amp;version=1&amp;user=304220" alt="loading awesome ratings..." />
+            <h1><span class="csfdInfo">ČSFD info</span> představuje:<br />statistiky hodnocení - jak na to?</h1>
+            <div class="cleaner"></div>
+        </div>
+            
+        <div id="content">
+            <div id="content0">
+                <p>Stačí pouze 2 jednoduché kroky a statistiky hodnocení budou i vaše!</p>
+            </div>
+            
+            <div id="content1">
+                <h2>Najděte svoje čsfd id</h2>
+                <img src="userId.jpg" alt="" />
+                <p>Každý uživatel má své unikátní číslo. Své čsfd id si lze přečíst
+                    v adresním řádku prohlížeče, když si zobrazíte vlastní profil. Hned nalevo od vašeho nicku.
+                </p>
+            </div>
+            
+            <div id="content2">
+                <h2>Vložte si do profilu tento kód</h2>
+                <div class="code">
+                    <code>
+                        &lt;div style="text-align:center;"&gt&lt;img width="206" height="200" src="http://csfd.herokuapp.com/?type=ratings&amp;version=1&amp;user=<span>304220</span>" alt="loading awesome ratings..." /&gt&lt;/div&gt;
+                    </code>
+                </div>
+                <p>Nezapomeňte v kódu přepsat <span>červeně vyznačené id</span> svým vlastním.</p>
+                <p>Na svém profilu klikněte na upravit, přepněte na "úprava v HTML" a vložte si statistiky na místo, kde je chcete mít.</p>
+            </div>
+            
+            <div id="content3">
+                <p>
+                    Pokud chcete mít statistiky nalevo/napravo, nahraďte v kódu slovo <code>"center"</code> 
+                    slovem <code>"left"/"right"</code>. Ovládáte-li HTML a CSS, nastylujte si zobrazení dle svého gusta =).
+                </p>
+                <p>
+                    Kvůli značným omezením ze strany csfd.cz se hodnocení hodně cachuje, nová data jsou vygenerována nejdříve po 3 hodinách (pokud je to nutné).
+                </p>
+                <p>Pokud objevíte nějaký problém nebo si nevíte s něčím rady, můžete mi napsat na venca163@gmail.com, nebo do čsfd pošty (uživatel venca163). Můžete mi také posílat nápady a návrhy na vylepšení.</p>
+            </div>
+        </div>
+        
+        <div id="footer">
+            venca163@gmail | 
+            <a href="https://github.com/venca163/csfd-info">zdroják čsfd-info projektu</a>
+        </div>
+    </body>
+</html>
