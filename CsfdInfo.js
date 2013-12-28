@@ -176,6 +176,7 @@ CsfdInfo.prototype._useCache = function (userId, apiFailFallback) {
     } 
     // fallback if cache retrieving fails
     else {
+        // API did not answer, no cache available
         if (apiFailFallback) {
             log('ERR >> API not reachable, no cache available. ' + userId);
             // everything failed
@@ -210,7 +211,7 @@ CsfdInfo.prototype._getRatingsFromApi = function (userId) {
         url: this._getApiUserUrl + userId + '/ratings',
         crossDomain: true,
         contentType: 'application/json; charset=utf-8',
-        timeout: 10000,
+        timeout: 40000,
         success: function (ratingsData) {
             csfdInfo._saveRatingsToCache(userId, ratingsData);
             csfdInfo._processRatingsData(ratingsData);
