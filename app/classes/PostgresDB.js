@@ -1,5 +1,5 @@
 
-var pgdb = require('../database/PostgresDB.json');
+//var pgdb = require('../database/PostgresDB.json');
 var pg = require('pg');
 
 var PostgresDB = function () {
