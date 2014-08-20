@@ -14,6 +14,13 @@ var app = express();
 
 app.get('/', function(req, res) {
     
+    var img = fs.readFileSync('./public/images/app/maintenance.png');
+    res.writeHead(200, {'Content-Type': 'image/png' });
+    res.end(img, 'binary');
+});
+
+app.get('/test', function(req, res) {
+    
     // get params from URL
     var userId = req.query.user;
     var type = req.query.type;
