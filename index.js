@@ -19,6 +19,8 @@ var app = express();
 //    res.writeHead(200, {'Content-Type': 'image/png' });
 //    res.end(img, 'binary');
 //});
+var ci = new CsfdInfoModule.CsfdInfo(null, 459485, "ratings", 1);
+ci.returnStatistics();
 
 app.get('/', function(req, res) {
     

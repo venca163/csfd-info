@@ -213,6 +213,7 @@ CsfdInfo.prototype._processRatingsData = function (ratings) {
   
     // compute ratings
     this._countStatistics(ratings);
+    return;
     // generate image and send it as response
     this._generateRatingsImage();
 };
@@ -248,11 +249,42 @@ CsfdInfo.prototype._countRatings = function (ratings) {
     });
 
     // count percentage distribution
-    var i;
-    for (i=0; i<this.ratings.distribution.length; i++) {
-        this.ratings.percentageDistribution[i] = 
-            Math.round(this.ratings.distribution[i] / ratingsNum * 100);
+    var diffArray = [];
+    var percentageCount = 0, realValue, roundedValue, diffValue;
+    for (var i=0; i<this.ratings.distribution.length; i++) {
+        realValue = this.ratings.distribution[i] / ratingsNum * 100;
+        roundedValue = Math.round(realValue);
+        diffValue = realValue - roundedValue;
+        console.log(realValue + " -> " + roundedValue + " -> " + diffValue);
+        diffArray.push({id: i, val:diffValue});
+        this.ratings.percentageDistribution[i] = roundedValue;
+        percentageCount += roundedValue;
     }
+    
+    var x;
+    var diff = percentageCount-100;
+    diffArray.sort(getSortNumericFunction());
+    if (diff > 0) {
+        for (var i = 0; i < diffArray.length;i++) {
+            x = diffArray[i];
+            if (x.val < 0) {
+                this.ratings.percentageDistribution[x.id]--;
+                diff--;
+                if (diff === 0) break;
+            }
+        }        
+    } else if (diff < 0) {
+        for (var i = diffArray.length-1; i >= 0; i--) {
+            x = diffArray[i];
+            if (x.val > 0) {
+                this.ratings.percentageDistribution[x.id]++;
+                diff++;
+                if (diff === 0) break;
+            }
+        }
+    }
+
+    console.log(this.ratings.percentageDistribution);
 
     this.ratings.num = ratingsNum;
 };
@@ -346,3 +378,4 @@ module.exports.CsfdInfo = CsfdInfo;
 
 var mod2 = require('../../helper.js');
 var getNowSeconds = mod2.getNowSeconds; 
+var getSortNumericFunction = mod2.getSortNumericFunction;
