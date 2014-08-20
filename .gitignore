@@ -37,3 +37,6 @@ dwsync.xml
 .svn
 .CVS
 .idea
+/appdata/database/PostgresDB.json
+/PgTest.js
+/test_canvas.js

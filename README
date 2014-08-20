@@ -4,5 +4,3 @@ App running on port 2301.
 
 Example local usage - type in browser:
 'serverurl:2301/?type=ratings&version=1&user=304220'
-
-(for now, just use cached data, dont change user id)
