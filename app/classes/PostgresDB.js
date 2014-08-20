@@ -4,7 +4,7 @@ var pg = require('pg');
 
 var PostgresDB = function () {
     
-    this.connectionString = pgdb.connectionString;
+    this.connectionString = process.env.DATABASE_URL || pgdb.connectionString;
     this.connected = false;
     
     this.connect();

@@ -12,19 +12,6 @@ var CsfdInfoModule = require('./app/classes/CsfdInfo.js');
 
 var app = express();
 
-// forward to 'CsfdInfo' class
-// returns image as response (if possible)
-//var mod1 = require('./app/classes/CsfdInfo.js');
-//var ci = new mod1.CsfdInfo(null, 304220, "ratings", 1);
-//ci.returnStatistics();
-
-//app.get('/', function (req, res) {
-//    console.log("///////////////////////////");
-//    console.log(req.url);
-//    console.log("///////////////////////////");
-////    res.end("end");
-//});
-
 app.get('/', function(req, res) {
     
     // get params from URL
@@ -68,7 +55,7 @@ app.get('/index.html', function (req, res) {
 /* secret test page */
 app.get('/crap!', function (req, res) {
     
-    res.send("Yeah, its working.");
+    res.send("Its working. (1)");
 });
 
 
