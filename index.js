@@ -12,14 +12,15 @@ var CsfdInfoModule = require('./app/classes/CsfdInfo.js');
 
 var app = express();
 
-app.get('/', function(req, res) {
-    
-    var img = fs.readFileSync('./public/images/app/maintenance.png');
-    res.writeHead(200, {'Content-Type': 'image/png' });
-    res.end(img, 'binary');
-});
+// maintenance
+//app.get('/', function(req, res) {
+//    
+//    var img = fs.readFileSync('./public/images/app/maintenance.png');
+//    res.writeHead(200, {'Content-Type': 'image/png' });
+//    res.end(img, 'binary');
+//});
 
-app.get('/test', function(req, res) {
+app.get('/', function(req, res) {
     
     // get params from URL
     var userId = req.query.user;
@@ -38,7 +39,7 @@ app.get('/test', function(req, res) {
         version = 1;
     }
     
-    console.log("********************");
+    console.log("********************************************************");
     console.log(req.url);
 
     // forward to 'CsfdInfo' class
