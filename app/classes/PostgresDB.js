@@ -1,10 +1,16 @@
 
-var pgdb = require('../database/PostgresDB.json');
 var pg = require('pg');
 
 var PostgresDB = function () {
     
-    this.connectionString = pgdb.connectionString;
+    this.connectionString = (function () {
+        if (process.env.DATABASE_URL) {
+            return process.env.DATABASE_URL;
+        } else {
+            var pgdb = require('../database/PostgresDB.json');
+            return pgdb.connectionString;
+        }
+    })();
 //    this.connectionString = process.env.DATABASE_URL;
     this.connected = false;
     
