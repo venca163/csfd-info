@@ -73,7 +73,6 @@ app.get('/crap!', function (req, res) {
 // serving static files - in public directory
 app.configure(function(){
     app.use(express.static(__dirname + '/public'));
-    app.use(express.static(__dirname + '/appdata'));
 });
 
 var port = process.env.PORT || 2301;
@@ -85,7 +84,4 @@ console.log('Example usage - type in browser:');
 console.log('<<serverurl>>:'+ port + '/?type=ratings&version=1&user=304220');
 
 //////////////////////////////////////////////////////////////////////////
-// custom functions
-//var mod2 = require('./helper.js');
-//var log = mod2.log; // get to each function like this? ugly!
 

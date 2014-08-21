@@ -26,9 +26,14 @@
             
             h1 {
                 margin-left: 0.5em;
-                margin-top: 1em;
-                font-size: 250%;
+                font-size: 200%;
+                width: 70%;
                 color: #eee;
+            }
+            h1 span.block {
+                display: block;
+                color: #eee;
+                font-size: 80%;
             }
             
             .cleaner {
@@ -70,15 +75,30 @@
             }
             
             .code {
-                font-size: 120%;
-                color: #111;
                 background: #eee;
             }
             
-            span {
+            .imgexample img {
+                float: left;
+                width: 150px;
+            }
+            
+            .code code {
+                margin-left: 10px;
+                float: left;
+                width: 70%;
+                font-size: 100%;
+                color: #111;
+            }
+            .code code:hover {
+                background: #ddd;
+            }
+            
+            span.mark {
                 color: crimson;
                 font-weight: bold;
             }
+            
             
             #footer {
                 margin-top: 8em;
@@ -103,8 +123,8 @@
     </head>
     <body>
         <div id="header">
-            <img src="http://csfd.herokuapp.com/?type=ratings&amp;version=1&amp;user=304220" alt="loading awesome ratings..." />
-            <h1><span class="csfdInfo">ČSFD info</span> představuje:<br />statistiky hodnocení - jak na to?</h1>
+            <img src="http://csfd.herokuapp.com/?type=ratings&amp;version=1&amp;user=304220" alt="načítám statistiky, vyčkejte prosím několik sekund..." />
+            <h1><span class="csfdInfo">ČSFD info</span> představuje: <span class="block">statistiky hodnocení - jak na to?</span></h1>
             <div class="cleaner"></div>
         </div>
             
@@ -114,7 +134,7 @@
             </div>
             
             <div id="content1">
-                <h2>Najděte svoje čsfd id</h2>
+                <h2>1. Najděte svoje čsfd id</h2>
                 <img src="userId.jpg" alt="" />
                 <p>Každý uživatel má své unikátní číslo. Své čsfd id si lze přečíst
                     v adresním řádku prohlížeče, když si zobrazíte vlastní profil. Hned nalevo od vaší čsfd přezdívky (vašeho nicku).
@@ -122,11 +142,26 @@
             </div>
             
             <div id="content2">
-                <h2>Vložte si do profilu tento kód</h2>
+                <h2>2. Vložte si do profilu tento kód</h2>
+                <h3>Klasický vzhled</h3>
                 <div class="code">
+                    <div class="imgexample">
+                        <img src="http://csfd.herokuapp.com/?type=ratings&amp;version=1&amp;user=304220" alt="načítám statistiky, vyčkejte prosím několik sekund..." />
+                    </div>
                     <code>
-                        &lt;div style="text-align:center;"&gt;&lt;img width="206" height="200" src="http://csfd.herokuapp.com/?type=ratings&amp;version=1&amp;user=<span>304220</span>" alt="načítám statistiky, vyčkejte prosím několik sekund..." /&gt;&lt;/div&gt;
+                        &lt;div style="text-align:center;"&gt;&lt;a href="http://www.csfd.cz/uzivatel/304220-venca163/"&gt;&lt;img width="206" height="200" src="http://csfd.herokuapp.com/?type=ratings&amp;version=1&amp;user=<span class="mark">304220</span>" alt="načítám statistiky, vyčkejte prosím několik sekund..." /&gt;&lt;/a&gt;&lt;/div&gt;
                     </code>
+                    <div class="cleaner"></div>
+                </div>
+                <h3>Oldschool vzhled</h3>
+                <div class="code">
+                    <div class="imgexample">
+                        <img src="http://csfd.herokuapp.com/?type=ratings&amp;version=2&amp;user=304220" alt="načítám statistiky, vyčkejte prosím několik sekund..." />
+                    </div>
+                    <code>
+                        &lt;div style="text-align:center;"&gt;&lt;a href="http://www.csfd.cz/uzivatel/304220-venca163/"&gt;&lt;img width="206" height="200" src="http://csfd.herokuapp.com/?type=ratings&amp;version=2&amp;user=<span class="mark">304220</span>" alt="načítám statistiky, vyčkejte prosím několik sekund..." /&gt;&lt;/a&gt;&lt;/div&gt;
+                    </code>
+                    <div class="cleaner"></div>
                 </div>
                 <p>Nezapomeňte v kódu přepsat <span>červeně vyznačené id</span> svým vlastním.</p>
                 <p>Na svém profilu klikněte na upravit, přepněte na "úprava v HTML" a vložte si statistiky na místo, kde je chcete mít.</p>
