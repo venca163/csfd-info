@@ -63,7 +63,7 @@ app.get('/index.html', function (req, res) {
 /* secret test page */
 app.get('/crap!', function (req, res) {
     
-    res.send("Its working. (1)");
+    res.send("Its working. (2)");
 });
 
 
@@ -80,9 +80,9 @@ var port = process.env.PORT || 2301;
 // listening on port
 app.listen(port);
 
-console.log('App running on port 2301 ...');
+console.log('App running on port ' + port);
 console.log('Example usage - type in browser:');
-console.log('serverurl:2301/?type=ratings&version=1&user=304220');
+console.log('<<serverurl>>:'+ port + '/?type=ratings&version=1&user=304220');
 
 //////////////////////////////////////////////////////////////////////////
 // custom functions

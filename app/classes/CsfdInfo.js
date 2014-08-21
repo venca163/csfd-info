@@ -310,24 +310,20 @@ CsfdInfo.prototype._generateRatingsImage = function () {
         var ctx = canvas.getContext('2d');
         
         var font = csfdInfo._getFont();
-        
+
         ctx.drawImage(img,0,0, img.width, img.height);
 
-//        ctx.font = 'bold italic 15pt Arial';
-//        ctx.fillStyle = 'white';
-//        ctx.fillText("ČSFD ratings", 5, 30);
-
         ctx.fillStyle = '#111';
-        var x = 125, y = 193, i;
-        for (i=0; i<csfdInfo.ratings.distribution.length; i++) {
+        var x = 125, y = 193;
+        for (var i=0; i<csfdInfo.ratings.distribution.length; i++) {
             ctx.font = 'bold 10pt ' + font;
             ctx.fillText(csfdInfo.ratings.distribution[i], x, y);
             ctx.font = '10pt ' + font;
             ctx.fillText('(' + csfdInfo.ratings.percentageDistribution[i] + '%)', x+35, y);
             y -= 25;
         }
-        var imgPngString = canvas.toDataURL('image/png');
 
+        var imgPngString = canvas.toDataURL('image/png');
         csfdInfo._sendRatingsImageAsResponse(imgPngString);
     });
 };
