@@ -38,6 +38,7 @@ var CsfdInfo = function (res, userId, type, version) {
 // constants
 CsfdInfo._CACHE_RATINGS_PATH = './public/data/cachedRatings/';
 CsfdInfo._RATINGS_IMG_BG_PATH_1 = './public/images/app/ratings_bg1.png';
+CsfdInfo._RATINGS_IMG_BG_PATH_2 = './public/images/app/ratings_bg2.png';
 CsfdInfo._CSFD_API_USER_URL = 'http://csfdapi.cz/user/';
 //
 /////////////////////////////////////////////////////////////
@@ -213,7 +214,7 @@ CsfdInfo.prototype._processRatingsData = function (ratings) {
   
     // compute ratings
     this._countStatistics(ratings);
-    return;
+
     // generate image and send it as response
     this._generateRatingsImage();
 };
@@ -255,12 +256,13 @@ CsfdInfo.prototype._countRatings = function (ratings) {
         realValue = this.ratings.distribution[i] / ratingsNum * 100;
         roundedValue = Math.round(realValue);
         diffValue = realValue - roundedValue;
-        console.log(realValue + " -> " + roundedValue + " -> " + diffValue);
         diffArray.push({id: i, val:diffValue});
         this.ratings.percentageDistribution[i] = roundedValue;
         percentageCount += roundedValue;
     }
     
+    console.log(this.ratings.percentageDistribution);
+    console.log(diffArray);
     var x;
     var diff = percentageCount-100;
     diffArray.sort(getSortNumericFunction());
@@ -283,9 +285,7 @@ CsfdInfo.prototype._countRatings = function (ratings) {
             }
         }
     }
-
     console.log(this.ratings.percentageDistribution);
-
     this.ratings.num = ratingsNum;
 };
 
@@ -306,22 +306,23 @@ CsfdInfo.prototype._generateRatingsImage = function () {
         }
         var img = new Canvas.Image();
         img.src = new Buffer(imgData, 'binary');
-
         var canvas = new Canvas(img.width, img.height);
         var ctx = canvas.getContext('2d');
         
+        var font = csfdInfo._getFont();
+        
         ctx.drawImage(img,0,0, img.width, img.height);
 
-        ctx.font = 'bold italic 15pt Arial';
-        ctx.fillStyle = 'white';
-        ctx.fillText("CSFD ratings", 5, 30);
+//        ctx.font = 'bold italic 15pt Arial';
+//        ctx.fillStyle = 'white';
+//        ctx.fillText("ČSFD ratings", 5, 30);
 
         ctx.fillStyle = '#111';
         var x = 125, y = 193, i;
         for (i=0; i<csfdInfo.ratings.distribution.length; i++) {
-            ctx.font = 'bold 10pt Arial';
+            ctx.font = 'bold 10pt ' + font;
             ctx.fillText(csfdInfo.ratings.distribution[i], x, y);
-            ctx.font = '10pt Arial';
+            ctx.font = '10pt ' + font;
             ctx.fillText('(' + csfdInfo.ratings.percentageDistribution[i] + '%)', x+35, y);
             y -= 25;
         }
@@ -339,10 +340,27 @@ CsfdInfo.prototype._getRatingsImageBgName = function () {
     switch (this._version) {
         case 1: 
             return CsfdInfo._RATINGS_IMG_BG_PATH_1;
+        case 2:
+            return CsfdInfo._RATINGS_IMG_BG_PATH_2;
         default: 
             return CsfdInfo._RATINGS_IMG_BG_PATH_1;
     }
 };
+
+/*
+ * Pick up font for version. 
+ */
+CsfdInfo.prototype._getFont = function () {
+    
+    switch(this._version) {
+        case 1:
+            return "Helvetica";
+        case 2:
+            return "Courier New";
+        default:
+            return "Arial";
+    }
+}
 
 
 /*

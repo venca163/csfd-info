@@ -19,8 +19,6 @@ var app = express();
 //    res.writeHead(200, {'Content-Type': 'image/png' });
 //    res.end(img, 'binary');
 //});
-var ci = new CsfdInfoModule.CsfdInfo(null, 459485, "ratings", 1);
-ci.returnStatistics();
 
 app.get('/', function(req, res) {
     
@@ -39,11 +37,11 @@ app.get('/', function(req, res) {
     // default version
     if (!version) {
         version = 1;
+    } else {
+        version = parseInt(version);
     }
     
-    console.log("********************************************************");
-    console.log(req.url);
-
+    console.log("************************ "  + req.url);
     // forward to 'CsfdInfo' class
     // returns image as response (if possible)
     var ci = new CsfdInfoModule.CsfdInfo(res, userId, type, version);
